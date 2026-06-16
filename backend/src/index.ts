@@ -13,9 +13,19 @@ const PORT = process.env.PORT ?? DEFAULT_PORT;
 
 const app = express();
 
+const allowedOrigins = [
+  env.FRONTEND_URL,
+  'http://localhost:3000',
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: env.FRONTEND_URL,
+    origin: (origin, callback) => {
+      // allow server-to-server / curl (no origin header)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      callback(new Error(`CORS: origin ${origin} not allowed`));
+    },
     credentials: true,
   })
 );
