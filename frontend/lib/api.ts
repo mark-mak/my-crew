@@ -34,8 +34,14 @@ apiClient.interceptors.response.use(
     const status = error.response?.status;
     const config = error.config;
 
+    // Skip retry for auth endpoints — login/refresh/register failures are final
+    const url = config?.url ?? '';
+    const isAuthEndpoint = ['/api/auth/refresh', '/api/auth/login', '/api/auth/register'].some(
+      (p) => url.includes(p)
+    );
+
     // Avoid infinite retry loops
-    if (status === 401 && config && !(config as unknown as Record<string, unknown>)['_retried']) {
+    if (status === 401 && config && !isAuthEndpoint && !(config as unknown as Record<string, unknown>)['_retried']) {
       (config as unknown as Record<string, unknown>)['_retried'] = true;
       try {
         const { data } = await apiClient.post<AuthResponse>('/api/auth/refresh');

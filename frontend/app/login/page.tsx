@@ -1,14 +1,22 @@
 'use client';
 
-import React, { useState, type FormEvent } from 'react';
+import React, { useState, useEffect, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { authApi } from '../../lib/api';
 import { tokenStore } from '../../lib/token-store';
+import axios from 'axios';
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 export default function LoginPage(): React.JSX.Element {
   const router = useRouter();
   const [email, setEmail] = useState('');
+
+  // Warm up the backend on page load so the server is ready when the user submits
+  useEffect(() => {
+    axios.get(`${BASE_URL}/api/health`).catch(() => { /* fire and forget */ });
+  }, []);
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
