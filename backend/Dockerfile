@@ -31,9 +31,10 @@ RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
 
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Copy manifests and install production deps only
+# Copy manifests and the full node_modules from builder, then prune devDeps
 COPY --chown=nodejs:nodejs package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile --prod
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
+RUN pnpm prune --prod
 
 # Copy compiled output and Prisma artifacts
 COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
