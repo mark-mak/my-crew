@@ -29,17 +29,12 @@ WORKDIR /app
 # Non-root user
 RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
 
-RUN corepack enable && corepack prepare pnpm@8.9.0 --activate
-
-# Copy manifests and the full node_modules from builder, then prune devDeps
-COPY --chown=nodejs:nodejs package.json pnpm-lock.yaml ./
+# Copy everything needed to run the app from the builder
+# (node_modules includes the Prisma-generated client from db:generate)
 COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
-RUN pnpm prune --prod
-
-# Copy compiled output and Prisma artifacts
 COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
-COPY --from=builder --chown=nodejs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
-COPY --chown=nodejs:nodejs prisma ./prisma
+COPY --from=builder --chown=nodejs:nodejs /app/package.json ./package.json
+COPY --from=builder --chown=nodejs:nodejs /app/prisma ./prisma
 
 USER nodejs
 
