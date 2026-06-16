@@ -3,8 +3,8 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Install pnpm (must match version used to generate pnpm-lock.yaml)
+RUN corepack enable && corepack prepare pnpm@8.9.0 --activate
 
 # Copy manifests first for layer caching
 COPY package.json pnpm-lock.yaml ./
@@ -29,7 +29,7 @@ WORKDIR /app
 # Non-root user
 RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
 
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN corepack enable && corepack prepare pnpm@8.9.0 --activate
 
 # Copy manifests and the full node_modules from builder, then prune devDeps
 COPY --chown=nodejs:nodejs package.json pnpm-lock.yaml ./
