@@ -1,0 +1,13 @@
+# All .env files at any depth — only .env.example is safe to commit
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea/
+.vscode/
+*.swp

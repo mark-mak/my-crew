@@ -1,0 +1,16 @@
+node_modules
+dist/
+
+# All .env files — commit only .env.example
+.env
+.env.*
+!.env.example
+
+# Prisma generated client
+/generated/prisma
+
+# Coverage
+coverage/
+
+# OS
+.DS_Store
